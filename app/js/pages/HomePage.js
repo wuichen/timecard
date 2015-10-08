@@ -19,20 +19,7 @@ var HomePage = React.createClass({
         var Staff = Parse.Object.extend("Staff");
         var queryObject = new Parse.Query(Staff);
         var self = this;
-        // queryObject.find({
-        //     success: function (results) {
-        //         for (var i = 0; i < results.length; i++) {
-        //             self.state.staffs.push(results[i].get('name'))
-        //         }
-        //         self.setState({
-        //             staffs: self.state.staffs
-        //         })
-        //     },
-        //     error: function (error) {
-        //         alert("Error: " + error.code + " " + error.message);
-        //     }
-        // })
-        
+
         queryObject.find().then(function(results){
                 for (var i = 0; i < results.length; i++) {
                     self.state.staffs.push(results[i].get('name'))
@@ -128,11 +115,12 @@ var HomePage = React.createClass({
                         return(
                             <div className={classNames('card','staffCard')}>
                                 <div className='card-image'>
-                                    <span className='card-title'>{staffName}</span>
                                     <img src='http://shackmanlab.org/wp-content/uploads/2013/07/person-placeholder.jpg' />
                                 </div>
                                 <div className='card-content'>
-                                    <a onClick={this.timePunch.bind(this,staffName,'morningSingIn')}>morning sign in </a>
+                                    <span className='card-title'>{staffName}</span>
+
+                                    <a onClick={this.timePunch.bind(this,staffName,'morningSignIn')}>morning sign in </a>
                                     <a onClick={this.timePunch.bind(this,staffName,'morningSignOut')}>morning sign out</a>
 
                                     <a onClick={this.timePunch.bind(this,staffName,'afternoonSignIn')}>afternoon sign in</a>
