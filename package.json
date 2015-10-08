@@ -39,6 +39,8 @@
     "gulp-util": "^3.0.6",
     "humps": "^0.6.0",
     "lodash": "^3.10.0",
+    "moment": "^2.10.6",
+    "moment-range": "^2.0.3",
     "morgan": "^1.6.1",
     "react": "^0.13.x",
     "react-document-title": "^1.0.2",
@@ -51,7 +53,9 @@
   },
   "dependencies": {
     "classnames": "^2.1.5",
+    "moment": "^2.10.6",
     "parse": "^1.6.5",
+    "react-daterange-picker": "^0.12.1",
     "react-input-calendar": "^0.1.13"
   }
 }
