@@ -1,7 +1,11 @@
 'use strict';
 
 import React         from 'react/addons';
+import Reflux             from 'reflux';
+
 import classNames from 'classnames'
+import TimeCardStore from '../stores/TimeCardStore';
+import TimeCardActions from '../actions/TimeCardActions';
 // var Parse = require('parse');
 // Parse.initialize("umJWoYdcF0EOGf62IiqOinOpmpUaUeYvyvn4QtZ5", "mCvBkC3Yr8lF5R5mNNVfMNWoKLBMOTjpSwaMZ6eH");
 
@@ -9,10 +13,8 @@ var ReactCSSTransitionGroup = React.addons.CSSTransitionGroup;
 
 
 var StaffTimeCard = React.createClass({
+    mixins: [Reflux.connect(TimeCardStore)],
     getInitialState() {
-        return({
-            expanded: false
-        })
     },
     displayName: 'StaffTimeCard',
 
@@ -21,12 +23,11 @@ var StaffTimeCard = React.createClass({
     },
 
     expand(){
-        this.setState({
-            expanded: !this.state.expanded
-        })
+        TimeCardActions.switchStaffCard(this.props.index);
     },
 
     render() {
+        console.log(this.props.isExpanded);
 
         return(
             <div className={classNames('card','staffTimeCard')} onClick={this.expand}>
@@ -38,7 +39,7 @@ var StaffTimeCard = React.createClass({
                 bonus<span className='number'> {Math.round(this.props.staff.totalWorkMinutes - this.props.staff.requiredWorkMinutes)} minutes</span>
                 
                 <ReactCSSTransitionGroup transitionName='expand'>
-                    {this.state.expanded && (
+                    {this.props.isExpanded && (
                         <div>
                             abc
                         </div>

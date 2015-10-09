@@ -1,6 +1,10 @@
 'use strict';
 
 import React         from 'react/addons';
+import Reflux             from 'reflux';
+import TimeCardStore from '../stores/TimeCardStore';
+import TimeCardActions from '../actions/TimeCardActions';
+
 import {Link}        from 'react-router';
 import DocumentTitle from 'react-document-title';
 var Calendar = require('react-input-calendar');
@@ -12,6 +16,7 @@ import StaffTimeCard from '../components/StaffTimeCard';
 
 
 const SearchPage = React.createClass({
+  mixins: [Reflux.connect(TimeCardStore)],
 
   getInitialState(){
     var date = new Date();
@@ -242,9 +247,15 @@ const SearchPage = React.createClass({
             />
             <a className={classNames('searchButton','waves-effect','waves-light','btn')} onClick={this.search}><i className={classNames('material-icons', 'right')}>search</i>Search</a>
           </div>
-          {this.state.staffs.map(function(staff){
+          {this.state.staffs.map(function(staff,index){
+              var isExpanded = false
+              if(index === this.state.selectedIndex){
+                  isExpanded = true;
+              }else{
+                  isExpanded = false;
+              }
               return(
-                  <StaffTimeCard staff={staff} />
+                  <StaffTimeCard staff={staff} isExpanded={isExpanded} index={index}/>
               )
           }.bind(this))}
 
