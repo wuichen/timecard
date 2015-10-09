@@ -76,6 +76,7 @@ var HomePage = React.createClass({
                 if(typeof results[0].get(signInOuttime) === 'undefined'){
                     return query.get(results[0].id)
                 }else{
+                    console.log('already logged in time');
                     return false;
                 }
             }else{
@@ -113,7 +114,7 @@ var HomePage = React.createClass({
                     
                     {this.state.staffs.map(function(staffName){
                         return(
-                            <div className={classNames('card','staffCard')}>
+                            <div className={classNames('card','staffProfileCard')}>
                                 <div className='card-image'>
                                     <img src='http://shackmanlab.org/wp-content/uploads/2013/07/person-placeholder.jpg' />
                                 </div>
