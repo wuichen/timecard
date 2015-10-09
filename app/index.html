@@ -16,6 +16,31 @@
 
 
     <style>
+        /******** expand animation ********/
+        .expand-enter {
+          max-height: 0;
+          overflow: hidden;
+          opacity: 0;
+        }
+        .expand-enter.expand-enter-active {
+          max-height: 100px;
+          transition: all 0.6s;
+          opacity: 1;
+        }
+        .expand-leave {
+          max-height: 100px;
+          opacity: 1;
+        }
+        .expand-leave.expand-leave-active {
+          max-height: 0;
+          overflow: hidden;
+          opacity: 0;
+          transition: all 0.3s;
+        }
+
+
+        /******** general style ********/
+
         body{
           background-color: white;
         }
@@ -79,6 +104,9 @@
         .number {
             color: #26a69a;
         }
+
+
+
         /***** Calendar ****/
 
 

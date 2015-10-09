@@ -8,6 +8,7 @@ import classNames from 'classnames'
 var Parse = require('parse');
 Parse.initialize("umJWoYdcF0EOGf62IiqOinOpmpUaUeYvyvn4QtZ5", "mCvBkC3Yr8lF5R5mNNVfMNWoKLBMOTjpSwaMZ6eH");
 
+import StaffTimeCard from '../components/StaffTimeCard';
 
 
 const SearchPage = React.createClass({
@@ -75,37 +76,100 @@ const SearchPage = React.createClass({
       query.find().then(function(results){
           var staffs = {};
           for (var i = 0; i < results.length; i++) {
+
               var totalWorkMilliseconds = 0;
               var requiredWorkMinutes = 0;
-              if(results[i].get('morningSignIn') || results.get('morningSignOut')){
-                  requiredWorkMinutes = requiredWorkMinutes + 210
-                  var morningSignIn = results[i].get('morningSignIn');
-                  var morningSignOut = results[i].get('morningSignOut');
-                  var morningWorkMilliseconds = Math.abs(morningSignOut - morningSignIn);
+              var workingRecord = {};
+              var missingTime = [];
 
-                  totalWorkMilliseconds = totalWorkMilliseconds + morningWorkMilliseconds;
+              workingRecord.date = results[i].get('createdAt');
+
+              if(typeof results[i].get('morningSignIn') != 'undefined' || typeof results[i].get('morningSignOut')!= 'undefined'){
+                  if(typeof results[i].get('morningSignIn') === 'undefined'){
+                      missingTime.push({
+                          date: results[i].get('createdAt'),
+                          missingTime: 'morningSignIn'
+                      })
+                  }else if(typeof results[i].get('morningSignOut')=== 'undefined'){
+                       missingTime.push({
+                          date: results[i].get('createdAt'),
+                          missingTime: 'morningSignOut'
+                      })                     
+                  }else{
+                      requiredWorkMinutes = requiredWorkMinutes + 210
+                      var morningSignIn = results[i].get('morningSignIn');
+                      var morningSignOut = results[i].get('morningSignOut');
+                      var morningWorkMilliseconds = Math.abs(morningSignOut - morningSignIn);
+
+                      totalWorkMilliseconds = totalWorkMilliseconds + morningWorkMilliseconds;
+                      workingRecord.morning = {
+                          morningSignIn: morningSignIn,
+                          morningSignOut: morningSignOut,
+                          morningMinutes: morningWorkMilliseconds/60000,
+                          bonus: morningWorkMilliseconds/6000 - 210
+                      }
+                  }
               }
 
-              if(results[i].get('afternoonSignIn') || results.get('afternoonSignOut')){
-                  requiredWorkMinutes = requiredWorkMinutes + 210
-                  var afternoonSignIn = results[i].get('afternoonSignIn');
-                  var afternoonSignOut = results[i].get('afternoonSignOut');
-                  var afternoonWorkMilliseconds = Math.abs(afternoonSignOut-afternoonSignIn);
-                  totalWorkMilliseconds = totalWorkMilliseconds + afternoonWorkMilliseconds;
+              if(typeof results[i].get('afternoonSignIn') != 'undefined'|| typeof results[i].get('afternoonSignOut')!= 'undefined'){
+                  if(typeof results[i].get('afternoonSignIn') === 'undefined'){
+                      missingTime.push({
+                          date: results[i].get('createdAt'),
+                          missingTime: 'afternoonSignIn'
+                      })
+                  }else if(typeof results[i].get('afternoonSignOut')=== 'undefined'){
+                       missingTime.push({
+                          date: results[i].get('createdAt'),
+                          missingTime: 'afternoonSignOut'
+                      })                     
+                  }else{
+                      requiredWorkMinutes = requiredWorkMinutes + 210
+                      var afternoonSignIn = results[i].get('afternoonSignIn');
+                      var afternoonSignOut = results[i].get('afternoonSignOut');
+                      var afternoonWorkMilliseconds = Math.abs(afternoonSignOut-afternoonSignIn);
+                      totalWorkMilliseconds = totalWorkMilliseconds + afternoonWorkMilliseconds;
+                      workingRecord.afternoon = {
+                          afternoonSignIn: afternoonSignIn,
+                          afternoonSignOut: afternoonSignOut,
+                          afternoonMinutes: afternoonWorkMilliseconds/60000,
+                          bonus: (afternoonWorkMilliseconds/6000 - 210)
+                      }
+                  }
               }
 
-              if(results[i].get('eveningSignIn') || results.get('eveningSignOut')){
-                  requiredWorkMinutes = requiredWorkMinutes + 180;
-                  var eveningSignIn = results[i].get('eveningSignIn');
-                  var eveningSignOut = results[i].get('eveningSignOut');
-                  var eveningWorkMilliseconds = Math.abs(eveningSignOut-eveningSignIn);
-                  totalWorkMilliseconds = totalWorkMilliseconds + eveningWorkMilliseconds;
+              if(typeof results[i].get('eveningSignIn') != 'undefined'|| typeof results[i].get('eveningSignOut') != 'undefined'){
+                  if(typeof results[i].get('eveningSignIn') === 'undefined'){
+                      missingTime.push({
+                          date: results[i].get('createdAt'),
+                          missingTime: 'eveningSignIn'
+                      })
+                  }else if(typeof results[i].get('eveningSignOut')=== 'undefined'){
+                       missingTime.push({
+                          date: results[i].get('createdAt'),
+                          missingTime: 'eveningSignOut'
+                      })                     
+                  }else{
+                      requiredWorkMinutes = requiredWorkMinutes + 180;
+                      var eveningSignIn = results[i].get('eveningSignIn');
+                      var eveningSignOut = results[i].get('eveningSignOut');
+                      var eveningWorkMilliseconds = Math.abs(eveningSignOut-eveningSignIn);
+                      totalWorkMilliseconds = totalWorkMilliseconds + eveningWorkMilliseconds;
+                      workingRecord.evening = {
+                          eveningSignIn: eveningSignIn,
+                          eveningSignOut: eveningSignOut,
+                          eveningMinutes: eveningWorkMilliseconds/60000,
+                          bonus: (eveningWorkMilliseconds/6000 - 180)
+                      }
+                  }
               }
 
+
+              // check if staff exists
               if(typeof staffs[results[i].get('name')] === 'undefined'){
                   staffs[results[i].get('name')] = {};
               }
 
+              // check if totalworkminutes exists
               if(staffs[results[i].get('name')].totalWorkMinutes){
                   var hours = staffs[results[i].get('name')].totalWorkMinutes;
                   staffs[results[i].get('name')].totalWorkMinutes = hours + totalWorkMilliseconds/60000
@@ -113,11 +177,21 @@ const SearchPage = React.createClass({
                   staffs[results[i].get('name')].totalWorkMinutes = totalWorkMilliseconds/60000
               }
 
+              // chcke if requiredworkminutes exists
               if(staffs[results[i].get('name')].requiredWorkMinutes){
+                console.log('here')
                   var hours = staffs[results[i].get('name')].requiredWorkMinutes;
                   staffs[results[i].get('name')].requiredWorkMinutes = hours + requiredWorkMinutes
               }else{
                   staffs[results[i].get('name')].requiredWorkMinutes = requiredWorkMinutes
+              }
+
+              // check if working records exists
+              if(staffs[results[i].get('name')].workingRecords){
+                staffs[results[i].get('name')].workingRecords.push(workingRecord)
+              }else{
+                staffs[results[i].get('name')].workingRecords = [];
+                staffs[results[i].get('name')].workingRecords.push(workingRecord)
               }
           }
 
@@ -170,14 +244,7 @@ const SearchPage = React.createClass({
           </div>
           {this.state.staffs.map(function(staff){
               return(
-                  <div className={classNames('card','staffTimeCard')}>
-                      <span>{staff.staffName}</span>
-                      <span> should work</span>
-                      <span className='number'> {Math.round(staff.requiredWorkMinutes)} </span>minutes
-                      <span> and worked</span>
-                      <span className='number'> {Math.round(staff.totalWorkMinutes)} </span>minutes
-                      bonus<span className='number'> {Math.round(staff.totalWorkMinutes - staff.requiredWorkMinutes)} minutes</span>
-                  </div>
+                  <StaffTimeCard staff={staff} />
               )
           }.bind(this))}
 
